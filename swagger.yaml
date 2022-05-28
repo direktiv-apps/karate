@@ -1,0 +1,177 @@
+swagger: "2.0"
+info:
+  description: Run karatelabs tests suite.
+  title: karate
+  version: "1.0"
+  x-direktiv-meta:
+    container: direktiv/karate
+    maintainer: |-
+      [direktiv.io](https://www.direktiv.io)
+    issues: https://github.com/direktiv-apps/karate/issues
+    url: https://github.com/direktiv-apps/karate 
+    categories:
+    - testing
+    license: |-
+      [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+    long-description: |-
+      This function runs [karate](https://github.com/karatelabs/karate) test scripts in a Direktiv funtion. 
+      It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv
+      to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
+consumes:
+- application/json
+produces:
+- application/json
+schemes:
+- http
+paths:
+  /: 
+    delete:
+      parameters:
+        - name: Direktiv-ActionID
+          in: header
+          type: string
+          description: |
+            On cancel Direktiv sends a DELETE request to
+            the action with id in the header
+      x-direktiv:
+        cancel: echo 'cancel {{ .DirektivActionID }}'
+      responses:
+        200:
+    post:
+      parameters:
+        - name: Direktiv-ActionID
+          in: header
+          type: string
+          description: |
+            direktiv action id is an UUID. 
+            For development it can be set to 'development'
+        - name: Direktiv-TempDir
+          in: header
+          type: string
+          description: |
+            direktiv temp dir is the working directory for that request
+            For development it can be set to e.g. '/tmp'
+        - name: body
+          in: body
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              files:
+                type: array
+                items:
+                  $ref: '#/definitions/direktivFile'
+                description: File to create before running commands.
+              logging:
+                type: string
+                example: DEBUG
+                description: Changes log level in logging.xml. Can be used as `-Dlogback.configurationFile=logging.xml` as argument.
+                default: WARN
+              commands:
+                type: array
+                description: Array of commands.
+                items:
+                  type: object
+                  properties:
+                    command:
+                      type: string
+                      description: Command to run
+                      example: java -Dtest.server=https://www.direktiv.io -jar /karate.jar --output out/workflow/ test.feature
+                    silent: 
+                      type: boolean
+                      description: If set to false the command will not print output to logs.
+                      default: false
+                    print: 
+                      type: boolean
+                      description: If set to false the command will not print the full command with arguments to logs.
+                      default: true
+                    continue: 
+                      type: boolean
+                      description: Stops excecution if command fails, otherwise proceeds with next command 
+      # direktiv code generation is configured here
+      x-direktiv-function: |-
+        functions:
+          - id: karate
+            image: direktiv/karate:1.0
+            type: knative-workflow
+      x-direktiv-examples:
+        - title: Basic
+          content: |-
+            - id: req
+                 type: action
+                 action:
+                   function: karate
+                   input:
+                    logging: DEBUG
+                    commands: 
+                    - java -Dtest.server=https://www.direktiv.io -jar /karate.jar --output out/workflow/ test.feature
+      x-direktiv:  
+        cmds:
+        - action: exec
+          exec: bash -c "sed 's/WARN/{{ default "WARN" .Logging }}/g' /log-config.xml > logging.xml"
+          continue: false
+        - action: foreach
+          loop: .Commands 
+          exec: '{{ .Item.Command }}'
+          silent: '{{ .Item.Silent }}'
+          print: '{{ .Item.Print }}'
+          continue: '{{ .Item.Continue }}'
+        output: |
+          {
+            "karate": {{ index . 1 | toJson }}
+          }
+      x-direktiv-errors:
+        io.direktiv.command.error: Command execution failed
+        io.direktiv.output.error: Template error for output generation of the service
+        io.direktiv.ri.error: Can not create information object from request
+      responses:
+        200:
+          description: nice greeting
+          examples:
+            karate:
+              karate:
+              - result: |-
+                  06:01:34.468 [main]  INFO  com.intuit.karate - Karate version: 1.2.0
+                success: true
+          schema:
+            type: object
+            properties:
+              karate:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - success
+                  - result
+                  properties:
+                    success:
+                      type: boolean
+                    result:
+                      additionalProperties: {}
+        default:
+          description: generic error response
+          headers:
+            Direktiv-ErrorCode:
+              type: string
+            Direktiv-ErrorMessage:
+              type: string
+          schema:
+            $ref: "#/definitions/error"
+definitions:
+  direktivFile:
+    type: object
+    x-go-type:
+      type: DirektivFile
+      import:
+        package: github.com/direktiv/apps/go/pkg/apps 
+  error:
+    type: object
+    required:
+      - errorCode
+      - errorMessage
+    properties:
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
