@@ -5,7 +5,7 @@ Run karatelabs tests suite.
 
 ---
 - #### Categories: testing
-- #### Image: direktiv/karate 
+- #### Image: gcr.io/direktiv/apps/karate 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 - #### Issue Tracking: https://github.com/direktiv-apps/karate/issues
 - #### URL: https://github.com/direktiv-apps/karate
@@ -23,7 +23,7 @@ to use them in subsequent states. Alternativley the last command can `cat` the r
   ```yaml
   functions:
   - id: karate
-    image: direktiv/karate:1.0
+    image: gcr.io/direktiv/apps/karate:1.0
     type: knative-workflow
   ```
    #### Basic
