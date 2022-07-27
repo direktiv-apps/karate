@@ -14,7 +14,7 @@ info:
     license: |-
       [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
     long-description: >-
-      This function runs [karate](https://github.com/karatelabs/karate) test scripts in a funtion. 
+      This function runs [karate](https://github.com/karatelabs/karate) test scripts in a function. 
       It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv
       to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
 consumes:
