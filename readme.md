@@ -14,7 +14,7 @@ KarateLab's Karate API testing
 
 ## About karate
 
-This function runs [karate](https://github.com/karatelabs/karate) test scripts in a funtion.  It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
+This function runs [karate](https://github.com/karatelabs/karate) test scripts in a function.  It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
 
 ### Example(s)
   #### Function Configuration
