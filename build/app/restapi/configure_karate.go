@@ -14,10 +14,10 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"karate/restapi/operations"
+	"app/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../app --name Karate --spec ../swagger.yaml --principal interface{}
+//go:generate swagger generate server --target ../../app --name Karate --spec ../../../swagger.yaml --template-dir /home/jensg/go/src/github.com/direktiv-apps/karate/build/templates --principal interface{}
 
 func configureFlags(api *operations.KarateAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }

@@ -2,7 +2,7 @@
 
 // Package restapi karate
 //
-//  Run karatelabs tests suite.
+//  KarateLab's Karate API testing
 //  Schemes:
 //    http
 //  Host: localhost

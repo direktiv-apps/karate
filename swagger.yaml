@@ -1,20 +1,20 @@
 swagger: "2.0"
 info:
-  description: Run karatelabs tests suite.
+  description: KarateLab's Karate API testing
   title: karate
   version: "1.0"
   x-direktiv-meta:
     container: gcr.io/direktiv/apps/karate
     maintainer: |-
-      [direktiv.io](https://www.direktiv.io)
+      [direktiv.io](https://www.direktiv.io) 
     issues: https://github.com/direktiv-apps/karate/issues
-    url: https://github.com/direktiv-apps/karate 
+    url: https://github.com/direktiv-apps/karate  
     categories:
-    - testing
+    - build
     license: |-
       [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
-    long-description: |-
-      This function runs [karate](https://github.com/karatelabs/karate) test scripts in a Direktiv funtion. 
+    long-description: >-
+      This function runs [karate](https://github.com/karatelabs/karate) test scripts in a funtion. 
       It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv
       to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
 consumes:
@@ -42,12 +42,14 @@ paths:
         - name: Direktiv-ActionID
           in: header
           type: string
+          default: development
           description: |
             direktiv action id is an UUID. 
             For development it can be set to 'development'
         - name: Direktiv-TempDir
           in: header
           type: string
+          default: /tmp
           description: |
             direktiv temp dir is the working directory for that request
             For development it can be set to e.g. '/tmp'
@@ -55,19 +57,17 @@ paths:
           in: body
           schema:
             type: object
-            required:
-              - name
             properties:
-              files:
-                type: array
-                items:
-                  $ref: '#/definitions/direktivFile'
-                description: File to create before running commands.
               logging:
                 type: string
                 example: DEBUG
                 description: Changes log level in logging.xml. Can be used as `-Dlogback.configurationFile=logging.xml` as argument.
                 default: WARN
+              files:
+                type: array
+                items:
+                  $ref: '#/definitions/direktivFile'
+                description: File to create before running commands.
               commands:
                 type: array
                 description: Array of commands.
@@ -92,25 +92,75 @@ paths:
       # direktiv code generation is configured here
       x-direktiv-function: |-
         functions:
-          - id: karate
-            image: gcr.io/direktiv/apps/karate:1.0
-            type: knative-workflow
+        - id: karate
+          image: gcr.io/direktiv/apps/karate:1.0
+          type: knative-workflow
       x-direktiv-examples:
+        # ADD MORE EXAMPLES HERE
         - title: Basic
           content: |-
-            - id: req
-                 type: action
-                 action:
-                   function: karate
-                   input:
-                    logging: DEBUG
-                    commands: 
-                    - java -Dtest.server=https://www.direktiv.io -jar /karate.jar --output out/workflow/ test.feature
+            - id: karate
+              type: action
+              action:
+                function: karate
+                input:
+                  commands:
+                  - command: java -jar /karate.jar test.feature
+                  - command: cat target/karate-reports/test.karate-json.txt
+                  files:
+                  - data: |-
+                      Feature: simple
+                      Scenario: test get
+                          Given url "https://www.direktiv.io"
+                          Given path '/'
+                          When method get
+                          Then status 200
+                    name: test.feature
+        - title: Logging
+          content: |-
+            - id: karate
+              type: action
+              action:
+                function: karate
+                input:
+                  logging: WARN
+                  commands:
+                  - command: java -Dlogback.configurationFile=logging.xml -jar /karate.jar  test.feature
+                  files:
+                  - data: |-
+                      Feature: simple
+                      Scenario: test get
+                          Given url "https://www.direktiv.io"
+                          Given path '/'
+                          When method get
+                          Then status 200
+                    name: test.feature
+        - title: Store in Variable
+          content: |-
+            - id: karate
+              type: action
+              action:
+                function: karate
+                input:
+                  logging: WARN
+                  commands:
+                  - command: java -jar /karate.jar -f ~html,cucumber:json test.feature
+                  - command: cp target/karate-reports/test.json out/workflow/test-result.json
+                  files:
+                  - data: |-
+                      Feature: simple
+                      Scenario: test get
+                          Given url "https://www.direktiv.io"
+                          Given path '/'
+                          When method get
+                          Then status 200
+                    name: test.feature
       x-direktiv:  
         cmds:
         - action: exec
           exec: bash -c "sed 's/WARN/{{ default "WARN" .Logging }}/g' /log-config.xml > logging.xml"
           continue: false
+          print: false
         - action: foreach
           loop: .Commands 
           exec: '{{ .Item.Command }}'
@@ -127,8 +177,9 @@ paths:
         io.direktiv.ri.error: Can not create information object from request
       responses:
         200:
-          description: nice greeting
+          description: List of executed commands.
           examples:
+            examples:
             karate:
               karate:
               - result: |-

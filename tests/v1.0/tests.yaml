@@ -1,0 +1,60 @@
+url: ""
+functions:
+- type: knative-workflow
+  id: karate
+  image: gcr.io/direktiv/apps/karate:test
+states:
+- id: state0
+  type: action
+  action:
+    function: karate
+    input:
+      commands:
+      - command: java -jar /karate.jar test.feature
+      - command: cat target/karate-reports/test.karate-json.txt
+      files:
+      - data: |-
+          Feature: simple
+          Scenario: test get
+              Given url "https://www.direktiv.io"
+              Given path '/'
+              When method get
+              Then status 200
+        name: test.feature
+  transition: state1
+- id: state1
+  type: action
+  action:
+    function: karate
+    input:
+      commands:
+      - command: java -Dlogback.configurationFile=logging.xml -jar /karate.jar  test.feature
+      files:
+      - data: |-
+          Feature: simple
+          Scenario: test get
+              Given url "https://www.direktiv.io"
+              Given path '/'
+              When method get
+              Then status 200
+        name: test.feature
+      logging: WARN
+  transition: state2
+- id: state2
+  type: action
+  action:
+    function: karate
+    input:
+      commands:
+      - command: java -jar /karate.jar -f ~html,cucumber:json test.feature
+      - command: ls -la target/karate-reports/
+      files:
+      - data: |-
+          Feature: simple
+          Scenario: test get
+              Given url "https://www.direktiv.io"
+              Given path '/'
+              When method get
+              Then status 200
+        name: test.feature
+      logging: WARN

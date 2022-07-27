@@ -10,13 +10,13 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"karate/models"
+	"app/models"
 )
 
 // PostOKCode is the HTTP code returned for type PostOK
 const PostOKCode int = 200
 
-/*PostOK nice greeting
+/*PostOK List of executed commands.
 
 swagger:response postOK
 */
@@ -25,7 +25,7 @@ type PostOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *PostOKBody `json:"body,omitempty"`
+	Payload *models.PostOKBody `json:"body,omitempty"`
 }
 
 // NewPostOK creates PostOK with default headers values
@@ -35,13 +35,13 @@ func NewPostOK() *PostOK {
 }
 
 // WithPayload adds the payload to the post o k response
-func (o *PostOK) WithPayload(payload *PostOKBody) *PostOK {
+func (o *PostOK) WithPayload(payload *models.PostOKBody) *PostOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the post o k response
-func (o *PostOK) SetPayload(payload *PostOKBody) {
+func (o *PostOK) SetPayload(payload *models.PostOKBody) {
 	o.Payload = payload
 }
 

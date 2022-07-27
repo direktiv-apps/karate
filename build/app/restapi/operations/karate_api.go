@@ -51,7 +51,7 @@ func NewKarateAPI(spec *loads.Document) *KarateAPI {
 	}
 }
 
-/*KarateAPI Run karatelabs tests suite. */
+/*KarateAPI KarateLab's Karate API testing */
 type KarateAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context

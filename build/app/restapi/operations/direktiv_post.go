@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 
-	"karate/models"
+	"app/models"
 )
 
 const (
@@ -37,13 +38,18 @@ type accParams struct {
 }
 
 type accParamsTemplate struct {
-	PostBody
+	models.PostParamsBody
 	Commands    []interface{}
 	DirektivDir string
 }
 
+type ctxInfo struct {
+	cf        context.CancelFunc
+	cancelled bool
+}
+
 func PostDirektivHandle(params PostParams) middleware.Responder {
-	resp := &PostOKBody{}
+	resp := &models.PostOKBody{}
 
 	var (
 		err  error
@@ -57,8 +63,13 @@ func PostDirektivHandle(params PostParams) middleware.Responder {
 	}
 
 	ctx, cancel := context.WithCancel(params.HTTPRequest.Context())
-	sm.Store(*params.DirektivActionID, cancel)
-	defer sm.Delete(params.DirektivActionID)
+
+	sm.Store(*params.DirektivActionID, &ctxInfo{
+		cancel,
+		false,
+	})
+
+	defer sm.Delete(*params.DirektivActionID)
 
 	var responses []interface{}
 
@@ -70,13 +81,27 @@ func PostDirektivHandle(params PostParams) middleware.Responder {
 	}
 
 	ret, err = runCommand0(ctx, accParams, ri)
+
 	responses = append(responses, ret)
 
 	// if foreach returns an error there is no continue
 	cont = convertTemplateToBool("false", accParams, true)
+	// cont = convertTemplateToBool("<no value>", accParams, true)
 
 	if err != nil && !cont {
+
 		errName := cmdErr
+
+		// if the delete function added the cancel tag
+		ci, ok := sm.Load(*params.DirektivActionID)
+		if ok {
+			cinfo, ok := ci.(*ctxInfo)
+			if ok && cinfo.cancelled {
+				errName = "direktiv.actionCancelled"
+				err = fmt.Errorf("action got cancel request")
+			}
+		}
+
 		return generateError(errName, err)
 	}
 
@@ -84,12 +109,26 @@ func PostDirektivHandle(params PostParams) middleware.Responder {
 	accParams.Commands = paramsCollector
 
 	ret, err = runCommand1(ctx, accParams, ri)
+
 	responses = append(responses, ret)
 
 	// if foreach returns an error there is no continue
+	cont = false
 
 	if err != nil && !cont {
+
 		errName := cmdErr
+
+		// if the delete function added the cancel tag
+		ci, ok := sm.Load(*params.DirektivActionID)
+		if ok {
+			cinfo, ok := ci.(*ctxInfo)
+			if ok && cinfo.cancelled {
+				errName = "direktiv.actionCancelled"
+				err = fmt.Errorf("action got cancel request")
+			}
+		}
+
 		return generateError(errName, err)
 	}
 
@@ -124,23 +163,22 @@ func runCommand0(ctx context.Context,
 	ir := make(map[string]interface{})
 	ir[successKey] = false
 
-	ri.Logger().Infof("executing command")
-
 	at := accParamsTemplate{
-		params.Body,
+		*params.Body,
 		params.Commands,
 		params.DirektivDir,
 	}
 
 	cmd, err := templateString(`bash -c "sed 's/WARN/{{ default "WARN" .Logging }}/g' /log-config.xml > logging.xml"`, at)
 	if err != nil {
+		ri.Logger().Infof("error executing command: %v", err)
 		ir[resultKey] = err.Error()
 		return ir, err
 	}
 	cmd = strings.Replace(cmd, "\n", "", -1)
 
 	silent := convertTemplateToBool("<no value>", at, false)
-	print := convertTemplateToBool("<no value>", at, true)
+	print := convertTemplateToBool("false", at, true)
 	output := ""
 
 	envs := []string{}
@@ -161,9 +199,11 @@ type LoopStruct1 struct {
 func runCommand1(ctx context.Context,
 	params accParams, ri *apps.RequestInfo) ([]map[string]interface{}, error) {
 
-	ri.Logger().Infof("foreach command over .Commands")
-
 	var cmds []map[string]interface{}
+
+	if params.Body == nil {
+		return cmds, nil
+	}
 
 	for a := range params.Body.Commands {
 

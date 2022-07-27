@@ -1,42 +1,101 @@
 
 # karate 1.0
 
-Run karatelabs tests suite.
+KarateLab's Karate API testing
 
 ---
-- #### Categories: testing
+- #### Categories: build
 - #### Image: gcr.io/direktiv/apps/karate 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 - #### Issue Tracking: https://github.com/direktiv-apps/karate/issues
 - #### URL: https://github.com/direktiv-apps/karate
-- #### Maintainer: [direktiv.io](https://www.direktiv.io)
+- #### Maintainer: [direktiv.io](https://www.direktiv.io) 
 ---
 
 ## About karate
 
-This function runs [karate](https://github.com/karatelabs/karate) test scripts in a Direktiv funtion. 
-It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv
-to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
+This function runs [karate](https://github.com/karatelabs/karate) test scripts in a funtion.  It provides a logging.xml file where the log level can be configured. The reports can be written to the `out` folder in Direktiv to use them in subsequent states. Alternativley the last command can `cat` the results, e.g. cat app/target/karate-reports/test.test.json
 
 ### Example(s)
   #### Function Configuration
-  ```yaml
-  functions:
-  - id: karate
-    image: gcr.io/direktiv/apps/karate:1.0
-    type: knative-workflow
-  ```
+```yaml
+functions:
+- id: karate
+  image: gcr.io/direktiv/apps/karate:1.0
+  type: knative-workflow
+```
    #### Basic
-   ```yaml
-   - id: req
-     type: action
-     action:
-       function: karate
-       input:
-        logging: DEBUG
-        commands: 
-        - java -Dtest.server=https://www.direktiv.io -jar /karate.jar --output out/workflow/ test.feature
-   ```
+```yaml
+- id: karate
+  type: action
+  action:
+    function: karate
+    input:
+      commands:
+      - command: java -jar /karate.jar test.feature
+      - command: cat target/karate-reports/test.karate-json.txt
+      files:
+      - data: |-
+          Feature: simple
+          Scenario: test get
+              Given url "https://www.direktiv.io"
+              Given path '/'
+              When method get
+              Then status 200
+        name: test.feature
+```
+   #### Logging
+```yaml
+- id: karate
+  type: action
+  action:
+    function: karate
+    input:
+      logging: WARN
+      commands:
+      - command: java -Dlogback.configurationFile=logging.xml -jar /karate.jar  test.feature
+      files:
+      - data: |-
+          Feature: simple
+          Scenario: test get
+              Given url "https://www.direktiv.io"
+              Given path '/'
+              When method get
+              Then status 200
+        name: test.feature
+```
+   #### Store in Variable
+```yaml
+- id: karate
+  type: action
+  action:
+    function: karate
+    input:
+      logging: WARN
+      commands:
+      - command: java -jar /karate.jar -f ~html,cucumber:json test.feature
+      - command: cp target/karate-reports/test.json out/workflow/test-result.json
+      files:
+      - data: |-
+          Feature: simple
+          Scenario: test get
+              Given url "https://www.direktiv.io"
+              Given path '/'
+              When method get
+              Then status 200
+        name: test.feature
+```
+
+   ### Secrets
+
+
+*No secrets required*
+
+
+
+
+
+
 
 ### Request
 
@@ -46,7 +105,7 @@ to use them in subsequent states. Alternativley the last command can `cat` the r
 [PostParamsBody](#post-params-body)
 
 ### Response
-  nice greeting
+  List of executed commands.
 #### Reponse Types
     
   
@@ -54,6 +113,9 @@ to use them in subsequent states. Alternativley the last command can `cat` the r
 [PostOKBody](#post-o-k-body)
 #### Example Reponses
     
+```json
+null
+```
 ```json
 {
   "karate": [
