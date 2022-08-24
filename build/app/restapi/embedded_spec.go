@@ -36,10 +36,10 @@ func init() {
       "categories": [
         "build"
       ],
-      "container": "gcr.io/direktiv/apps/karate",
+      "container": "direktiv.azurecr.io/functions/karate",
       "issues": "https://github.com/direktiv-apps/karate/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
-      "long-description": "This function runs [karate](https://github.com/karatelabs/karate) test scripts in a funtion.  It provides a logging.xml file where the log level can be configured. The reports can be written to the ` + "`" + `out` + "`" + ` folder in Direktiv to use them in subsequent states. Alternativley the last command can ` + "`" + `cat` + "`" + ` the results, e.g. cat app/target/karate-reports/test.test.json",
+      "long-description": "This function runs [karate](https://github.com/karatelabs/karate) test scripts in a function.  It provides a logging.xml file where the log level can be configured. The reports can be written to the ` + "`" + `out` + "`" + ` folder in Direktiv to use them in subsequent states. Alternativley the last command can ` + "`" + `cat` + "`" + ` the results, e.g. cat app/target/karate-reports/test.test.json",
       "maintainer": "[direktiv.io](https://www.direktiv.io) ",
       "url": "https://github.com/direktiv-apps/karate"
     }
@@ -200,11 +200,11 @@ func init() {
             "title": "Logging"
           },
           {
-            "content": "- id: karate\n  type: action\n  action:\n    function: karate\n    input:\n      logging: WARN\n      commands:\n      - command: java -jar /karate.jar -f ~html,cucumber:json test.feature\n      - command: ls -la target/karate-reports/\n      files:\n      - data: |-\n          Feature: simple\n          Scenario: test get\n              Given url \"https://www.direktiv.io\"\n              Given path '/'\n              When method get\n              Then status 200\n        name: test.feature",
+            "content": "- id: karate\n  type: action\n  action:\n    function: karate\n    input:\n      logging: WARN\n      commands:\n      - command: java -jar /karate.jar -f ~html,cucumber:json test.feature\n      - command: cp target/karate-reports/test.json out/workflow/test-result.json\n      files:\n      - data: |-\n          Feature: simple\n          Scenario: test get\n              Given url \"https://www.direktiv.io\"\n              Given path '/'\n              When method get\n              Then status 200\n        name: test.feature",
             "title": "Store in Variable"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: karate\n  image: gcr.io/direktiv/apps/karate:1.0\n  type: knative-workflow"
+        "x-direktiv-function": "functions:\n- id: karate\n  image: direktiv.azurecr.io/functions/karate:1.0\n  type: knative-workflow"
       },
       "delete": {
         "parameters": [
@@ -272,10 +272,10 @@ func init() {
       "categories": [
         "build"
       ],
-      "container": "gcr.io/direktiv/apps/karate",
+      "container": "direktiv.azurecr.io/functions/karate",
       "issues": "https://github.com/direktiv-apps/karate/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
-      "long-description": "This function runs [karate](https://github.com/karatelabs/karate) test scripts in a funtion.  It provides a logging.xml file where the log level can be configured. The reports can be written to the ` + "`" + `out` + "`" + ` folder in Direktiv to use them in subsequent states. Alternativley the last command can ` + "`" + `cat` + "`" + ` the results, e.g. cat app/target/karate-reports/test.test.json",
+      "long-description": "This function runs [karate](https://github.com/karatelabs/karate) test scripts in a function.  It provides a logging.xml file where the log level can be configured. The reports can be written to the ` + "`" + `out` + "`" + ` folder in Direktiv to use them in subsequent states. Alternativley the last command can ` + "`" + `cat` + "`" + ` the results, e.g. cat app/target/karate-reports/test.test.json",
       "maintainer": "[direktiv.io](https://www.direktiv.io) ",
       "url": "https://github.com/direktiv-apps/karate"
     }
@@ -373,11 +373,11 @@ func init() {
             "title": "Logging"
           },
           {
-            "content": "- id: karate\n  type: action\n  action:\n    function: karate\n    input:\n      logging: WARN\n      commands:\n      - command: java -jar /karate.jar -f ~html,cucumber:json test.feature\n      - command: ls -la target/karate-reports/\n      files:\n      - data: |-\n          Feature: simple\n          Scenario: test get\n              Given url \"https://www.direktiv.io\"\n              Given path '/'\n              When method get\n              Then status 200\n        name: test.feature",
+            "content": "- id: karate\n  type: action\n  action:\n    function: karate\n    input:\n      logging: WARN\n      commands:\n      - command: java -jar /karate.jar -f ~html,cucumber:json test.feature\n      - command: cp target/karate-reports/test.json out/workflow/test-result.json\n      files:\n      - data: |-\n          Feature: simple\n          Scenario: test get\n              Given url \"https://www.direktiv.io\"\n              Given path '/'\n              When method get\n              Then status 200\n        name: test.feature",
             "title": "Store in Variable"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: karate\n  image: gcr.io/direktiv/apps/karate:1.0\n  type: knative-workflow"
+        "x-direktiv-function": "functions:\n- id: karate\n  image: direktiv.azurecr.io/functions/karate:1.0\n  type: knative-workflow"
       },
       "delete": {
         "parameters": [
