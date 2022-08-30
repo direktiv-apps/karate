@@ -2,7 +2,7 @@ url: ""
 functions:
 - type: knative-workflow
   id: karate
-  image: direktiv.azurecr.io/misc/karate:latest
+  image: direktiv.azurecr.io/functions/karate:test
 states:
 - id: state0
   type: action
@@ -47,7 +47,7 @@ states:
     input:
       commands:
       - command: java -jar /karate.jar -f ~html,cucumber:json test.feature
-      - command: ls -la target/karate-reports/
+      - command: cp target/karate-reports/test.json out/workflow/test-result.json
       files:
       - data: |-
           Feature: simple

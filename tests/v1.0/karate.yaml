@@ -2,8 +2,7 @@ url: ""
 functions:
 - type: knative-workflow
   id: karate
-  image: direktiv.azurecr.io/misc/karate:latest
-  
+  image: direktiv.azurecr.io/functions/karate:1.0
 states:
 - id: run-test
   type: action
