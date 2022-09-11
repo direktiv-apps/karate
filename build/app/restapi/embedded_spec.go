@@ -36,7 +36,7 @@ func init() {
       "categories": [
         "build"
       ],
-      "container": "direktiv.azurecr.io/functions/karate",
+      "container": "gcr.io/direktiv/functions/karate",
       "issues": "https://github.com/direktiv-apps/karate/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function runs [karate](https://github.com/karatelabs/karate) test scripts in a function.  It provides a logging.xml file where the log level can be configured. The reports can be written to the ` + "`" + `out` + "`" + ` folder in Direktiv to use them in subsequent states. Alternativley the last command can ` + "`" + `cat` + "`" + ` the results, e.g. cat app/target/karate-reports/test.test.json",
@@ -204,7 +204,7 @@ func init() {
             "title": "Store in Variable"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: karate\n  image: direktiv.azurecr.io/functions/karate:1.0\n  type: knative-workflow"
+        "x-direktiv-function": "functions:\n- id: karate\n  image: gcr.io/direktiv/functions/karate:1.0\n  type: knative-workflow"
       },
       "delete": {
         "parameters": [
@@ -272,7 +272,7 @@ func init() {
       "categories": [
         "build"
       ],
-      "container": "direktiv.azurecr.io/functions/karate",
+      "container": "gcr.io/direktiv/functions/karate",
       "issues": "https://github.com/direktiv-apps/karate/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function runs [karate](https://github.com/karatelabs/karate) test scripts in a function.  It provides a logging.xml file where the log level can be configured. The reports can be written to the ` + "`" + `out` + "`" + ` folder in Direktiv to use them in subsequent states. Alternativley the last command can ` + "`" + `cat` + "`" + ` the results, e.g. cat app/target/karate-reports/test.test.json",
@@ -377,7 +377,7 @@ func init() {
             "title": "Store in Variable"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: karate\n  image: direktiv.azurecr.io/functions/karate:1.0\n  type: knative-workflow"
+        "x-direktiv-function": "functions:\n- id: karate\n  image: gcr.io/direktiv/functions/karate:1.0\n  type: knative-workflow"
       },
       "delete": {
         "parameters": [

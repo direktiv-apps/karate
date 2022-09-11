@@ -4,7 +4,7 @@ info:
   title: karate
   version: "1.0"
   x-direktiv-meta:
-    container: direktiv.azurecr.io/functions/karate
+    container: gcr.io/direktiv/functions/karate
     maintainer: |-
       [direktiv.io](https://www.direktiv.io) 
     issues: https://github.com/direktiv-apps/karate/issues
@@ -93,7 +93,7 @@ paths:
       x-direktiv-function: |-
         functions:
         - id: karate
-          image: direktiv.azurecr.io/functions/karate:1.0
+          image: gcr.io/direktiv/functions/karate:1.0
           type: knative-workflow
       x-direktiv-examples:
         # ADD MORE EXAMPLES HERE

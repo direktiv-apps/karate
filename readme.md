@@ -5,7 +5,7 @@ KarateLab's Karate API testing
 
 ---
 - #### Categories: build
-- #### Image: direktiv.azurecr.io/functions/karate 
+- #### Image: gcr.io/direktiv/functions/karate 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 - #### Issue Tracking: https://github.com/direktiv-apps/karate/issues
 - #### URL: https://github.com/direktiv-apps/karate
@@ -21,7 +21,7 @@ This function runs [karate](https://github.com/karatelabs/karate) test scripts i
 ```yaml
 functions:
 - id: karate
-  image: direktiv.azurecr.io/functions/karate:1.0
+  image: gcr.io/direktiv/functions/karate:1.0
   type: knative-workflow
 ```
    #### Basic
