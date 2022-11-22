@@ -13,7 +13,7 @@ RUN cd src && \
 
 FROM ubuntu:22.04
 
-RUN apt-get update && apt-get install ca-certificates wget openjdk-17-jre git -y
+RUN apt-get update && apt-get install ca-certificates wget openjdk-17-jre git jq -y
 
 RUN wget https://github.com/karatelabs/karate/releases/download/v1.2.0/karate-1.2.0.jar
 RUN mv karate-1.2.0.jar karate.jar
